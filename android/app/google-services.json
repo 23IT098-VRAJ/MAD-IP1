@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "976219134569",
+    "project_id": "mad-ip-1",
+    "storage_bucket": "mad-ip-1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:976219134569:android:bc71519a04f45e131be0f8",
+        "android_client_info": {
+          "package_name": "com.smartfab.materialtracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5QXDUtck454cjD3PVAnZW0axUiOghuZ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -15,8 +15,8 @@ import '../models/usage_log.dart';
 import '../services/cloud_sync_service.dart';
 
 class AppDataProvider extends ChangeNotifier {
-  AppDataProvider({CloudSyncService? cloudSyncService})
-    : _cloudSyncService = cloudSyncService ?? CloudSyncService();
+  AppDataProvider({required CloudSyncService cloudSyncService})
+    : _cloudSyncService = cloudSyncService;
 
   static const String _boxName = 'smartfab_box';
   static const String _materialsKey = 'materials';

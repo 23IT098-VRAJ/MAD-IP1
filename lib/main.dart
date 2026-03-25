@@ -18,12 +18,16 @@ import 'screens/home/role_router_screen.dart';
 import 'screens/operator/operator_dashboard_screen.dart';
 import 'screens/operator/scan_log_screen.dart';
 import 'screens/operator/tasks_screen.dart';
+import 'services/cloud_sync_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
 
-  final AppDataProvider appDataProvider = AppDataProvider();
+  final CloudSyncService cloudSyncService = await CloudSyncService.create();
+  final AppDataProvider appDataProvider = AppDataProvider(
+    cloudSyncService: cloudSyncService,
+  );
   await appDataProvider.init();
 
   runApp(
