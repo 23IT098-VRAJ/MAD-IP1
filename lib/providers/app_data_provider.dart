@@ -58,6 +58,34 @@ class AppDataProvider extends ChangeNotifier {
         .toList(growable: false);
   }
 
+  AppUser? findUserByUsername(String username) {
+    final String normalized = username.trim().toLowerCase();
+    for (final AppUser user in _users) {
+      if (user.username.trim().toLowerCase() == normalized && user.isActive) {
+        return user;
+      }
+    }
+    return null;
+  }
+
+  Future<AppUser> ensureUserProfile({
+    required String username,
+    required String fullName,
+    UserRole role = UserRole.operator,
+  }) async {
+    final AppUser? existing = findUserByUsername(username);
+    if (existing != null) {
+      return existing;
+    }
+
+    return addUser(
+      username: username,
+      password: '',
+      role: role,
+      fullName: fullName,
+    );
+  }
+
   Future<void> init() async {
     _isLoading = true;
     notifyListeners();
@@ -256,15 +284,21 @@ class AppDataProvider extends ChangeNotifier {
     await _persistAndNotify();
   }
 
-  Future<void> addUser({
+  Future<AppUser> addUser({
     required String username,
     required String password,
     required UserRole role,
     required String fullName,
   }) async {
+    final String normalizedUsername = username.trim().toLowerCase();
+    final AppUser? existing = findUserByUsername(normalizedUsername);
+    if (existing != null) {
+      return existing;
+    }
+
     final AppUser user = AppUser(
       id: _uuid.v4(),
-      username: username,
+      username: normalizedUsername,
       password: password,
       role: role,
       fullName: fullName,
@@ -273,6 +307,7 @@ class AppDataProvider extends ChangeNotifier {
     _users = <AppUser>[..._users, user];
     _queueSync('add_user', user.toMap());
     await _persistAndNotify();
+    return user;
   }
 
   Future<void> toggleTaskCompletion(String taskId) async {

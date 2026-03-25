@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _login() async {
+  Future<void> _submit() async {
     final bool isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) {
       return;
@@ -38,10 +38,12 @@ class _LoginScreenState extends State<LoginScreen> {
     final AppDataProvider dataProvider = context.read<AppDataProvider>();
     final AuthProvider authProvider = context.read<AuthProvider>();
 
+    authProvider.clearError();
+
     final bool success = await authProvider.login(
       username: _usernameController.text.trim(),
       password: _passwordController.text.trim(),
-      users: dataProvider.users,
+      dataProvider: dataProvider,
     );
 
     if (!mounted) {
@@ -50,7 +52,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.invalidCredentials)),
+        SnackBar(
+          content: Text(
+            authProvider.errorMessage ?? AppStrings.invalidCredentials,
+          ),
+        ),
       );
       return;
     }
@@ -121,8 +127,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: AppSizes.lg),
                       AppButton(
                         label: AppStrings.signIn,
-                        onPressed: authProvider.isLoading ? null : _login,
+                        onPressed: authProvider.isLoading ? null : _submit,
                         icon: Icons.login,
+                      ),
+                      const SizedBox(height: AppSizes.sm),
+                      Text(
+                        'Use admin/admin123 or operator/operator123',
+                        style: AppTextStyles.caption,
                       ),
                     ],
                   ),

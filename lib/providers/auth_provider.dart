@@ -1,41 +1,55 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/app_user.dart';
+import 'app_data_provider.dart';
 
 class AuthProvider extends ChangeNotifier {
   AppUser? _currentUser;
   bool _isLoading = false;
+  String? _errorMessage;
 
   AppUser? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   bool get isLoggedIn => _currentUser != null;
+  String? get errorMessage => _errorMessage;
 
   Future<bool> login({
     required String username,
     required String password,
-    required List<AppUser> users,
+    required AppDataProvider dataProvider,
   }) async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
-    final AppUser? user = users
-        .where((AppUser entry) {
-          return entry.username == username &&
-              entry.password == password &&
-              entry.isActive;
-        })
-        .cast<AppUser?>()
-        .firstWhere((AppUser? element) => element != null, orElse: () => null);
+    try {
+      final AppUser? user = dataProvider.findUserByUsername(username);
+      final bool isValid =
+          user != null && user.password == password.trim() && user.isActive;
 
-    _currentUser = user;
+      if (!isValid) {
+        _errorMessage = 'Invalid credentials. Please try again.';
+        _currentUser = null;
+        return false;
+      }
+
+      _currentUser = user;
+      return true;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void clearError() {
+    _errorMessage = null;
     _isLoading = false;
     notifyListeners();
-
-    return user != null;
   }
 
   void logout() {
     _currentUser = null;
+    _errorMessage = null;
     notifyListeners();
   }
 }
